@@ -112,14 +112,26 @@ def display_heatmaps(df):
         heatmap_matrix = pd.DataFrame(0, index=number_covered, columns=["Betting Coverage"])
 
         # Fill the heatmap matrix based on betting data
-        for betting_dict in df['number_cost_dict']:
-            for number, amount in betting_dict.items():
-                heatmap_matrix.loc[int(number)] += amount
+        for index, betting_dict in enumerate(df['number_cost_dict']):
+            if isinstance(betting_dict, dict):
+                for number, amount in betting_dict.items():
+                    try:
+                        number = int(number)  # Ensure the key is an integer (betting number)
+                        if 1 <= number <= 100:  # Check if the number is within the valid range
+                            heatmap_matrix.loc[number] += amount  # Add the betting amount to the heatmap
+                        else:
+                            st.warning(f"Invalid number {number} in row {index}. Skipping this entry.")
+                    except ValueError:
+                        st.error(f"Non-integer key detected in row {index}: {number}. Skipping this entry.")
+            else:
+                st.error(f"Invalid betting_dict at row {index}: {betting_dict}")
 
         # Visualize the number betting heatmap
         fig, ax = plt.subplots(figsize=(10, 8))
         sns.heatmap(heatmap_matrix, cmap='YlGnBu', annot=False, cbar=True, ax=ax)
+        plt.title('Number Betting Heatmap')
         st.pyplot(fig)
+
     except Exception as e:
         st.error(f"Error in number betting heatmap: {e}")
 
