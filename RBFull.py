@@ -100,9 +100,13 @@ def generate_top_winners_bar_chart(df):
     st.plotly_chart(fig)
 
 
+import ast
+
 def display_heatmaps(df):
     # Number Betting Heatmap
     st.subheader("Number Betting Heatmap")
+    invalid_entries_count = 0  # Counter for invalid entries
+
     try:
         # Convert string dictionaries to actual dictionaries
         df['number_cost_dict'] = df['number_cost_dict'].apply(lambda x: ast.literal_eval(x) if isinstance(x, str) else x)
@@ -120,11 +124,24 @@ def display_heatmaps(df):
                         if 1 <= number <= 100:  # Check if the number is within the valid range
                             heatmap_matrix.loc[number] += amount  # Add the betting amount to the heatmap
                         else:
-                            st.warning(f"Invalid number {number} in row {index}. Skipping this entry.")
+                            invalid_entries_count += 1  # Count invalid numbers instead of displaying each error
                     except ValueError:
-                        st.error(f"Non-integer key detected in row {index}: {number}. Skipping this entry.")
+                        invalid_entries_count += 1  # Count errors if non-integer key is detected
             else:
-                st.error(f"Invalid betting_dict at row {index}: {betting_dict}")
+                invalid_entries_count += 1  # Count invalid betting_dicts
+
+        # Display a summary message if there are invalid entries
+        if invalid_entries_count > 0:
+            st.warning(f"Skipped {invalid_entries_count} invalid entries with betting numbers outside the range 1-100.")
+
+        # Visualize the number betting heatmap
+        fig, ax = plt.subplots(figsize=(10, 8))
+        sns.heatmap(heatmap_matrix, cmap='YlGnBu', annot=False, cbar=True, ax=ax)
+        plt.title('Number Betting Heatmap')
+        st.pyplot(fig)
+
+    except Exception as e:
+        st.error(f"Error in number betting heatmap: {e}")
 
         # Visualize the number betting heatmap
         fig, ax = plt.subplots(figsize=(10, 8))
