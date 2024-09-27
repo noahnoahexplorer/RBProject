@@ -100,11 +100,13 @@ def generate_top_winners_bar_chart(df):
     st.plotly_chart(fig)
 
 
-# Function to display heatmaps based on the betting data
 def display_heatmaps(df):
     # Number Betting Heatmap
     st.subheader("Number Betting Heatmap")
     try:
+        # Convert string dictionaries to actual dictionaries
+        df['number_cost_dict'] = df['number_cost_dict'].apply(lambda x: ast.literal_eval(x) if isinstance(x, str) else x)
+        
         # Create a DataFrame for betting data
         number_covered = list(range(1, 101))  # Numbers from 1 to 100
         heatmap_matrix = pd.DataFrame(0, index=number_covered, columns=["Betting Coverage"])
