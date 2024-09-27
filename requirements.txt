@@ -2,4 +2,4 @@ pytest
 pytest-cov
 pandas
 plotly
-
+streamlit
