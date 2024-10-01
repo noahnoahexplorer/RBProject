@@ -56,11 +56,25 @@ if uploaded_file is not None:
         heatmap_data.columns = [f'{i+1}' for i in range(10)]
         heatmap_data.index = [f'{i*10+1}-{(i+1)*10}' for i in range(10)]
 
-        # Visualize the heatmap
-        st.subheader("Heatmap of Total Bets by Number (1 to 100)")
+        # Visualize the heatmap using Seaborn
+        st.subheader("Heatmap of Total Bets by Number (1 to 100) using Seaborn")
         fig, ax = plt.subplots(figsize=(10, 8))
         sns.heatmap(heatmap_data, annot=True, fmt='.0f', cmap='YlGnBu', ax=ax)
-        st.pyplot(fig)
+        plt.tight_layout()  # Ensure the plot fits within the figure area
+        st.pyplot(fig)  # Render the heatmap in Streamlit
+        plt.close(fig)  # Close the figure to avoid memory leaks
+
+        # Option to use Plotly for heatmap instead of Seaborn
+        st.subheader("Heatmap of Total Bets by Number (1 to 100) using Plotly")
+        fig = px.imshow(
+            heatmap_data.values,
+            labels=dict(x="Number", y="Range", color="Total Bets"),
+            x=heatmap_data.columns,
+            y=heatmap_data.index,
+            color_continuous_scale="YlGnBu"
+        )
+        st.plotly_chart(fig)
+
     else:
         st.write("The 'number_cost_dict' column is not found in the dataset. Please check your data.")
 
